@@ -64,14 +64,14 @@ simulate_rankings <- function(data) {
 crime_data_ranked <- simulate_rankings(crime_data)
 head(crime_data_ranked)
 
-# Simulate random geometry (latitude and longitude) for neighborhoods
+# Simulate geometry data (latitude and longitude) for neighborhoods
 simulate_geometry <- function(n) {
   latitudes <- runif(n, min = 43.6, max = 43.85)  # Toronto's latitude range
   longitudes <- runif(n, min = -79.6, max = -79.1)  # Toronto's longitude range
   st_as_sf(data.frame(
     lat = latitudes, 
     lon = longitudes
-  ), coords = c("lon", "lat"), crs = 4326)  # Create spatial points
+  ), coords = c("lon", "lat"), crs = 4326)
 }
 neighborhood_geometries <- simulate_geometry(n_neighborhoods)
 
