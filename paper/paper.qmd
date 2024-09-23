@@ -1,0 +1,203 @@
+---
+title: "Crime Frequency and Population Density: Analyzing Crime Rates in Toronto Neighborhoods"
+author: 
+  - Yongqi Liu
+thanks: "Code and data are available at: https://github.com/Cassieliu77/starter_folder-master.git."
+date: 24 September 2024
+date-format: long
+toc: true 
+abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+format: pdf
+number-sections: true
+bibliography: references.bib
+---
+
+```{r}
+#| include: false
+#| warning: false
+#| message: false
+
+# install.packages(c("ggplot2", "dplyr", "viridis", "sf", "patchwork", "gt"))
+library(tidyverse)
+library(httr)
+library(opendatatoronto)
+library(ggplot2)
+library(knitr)
+#library(dplyr)
+#library(viridis)  
+#library(gt)
+#library(patchwork)
+```
+
+# Introduction
+Urban crime trends have long been studied due to their impact on social stability and policy-making. In Toronto, crime rates vary significantly across neighborhoods, often influenced by factors such as population density and economic disparity. This paper focuses on analyzing the trends in crime frequency across different types of crimes, using data from 2014 to 2023. The objective is to determine how crime patterns have changed over time and which neighborhoods are most affected.
+
+# Data {#sec-data}
+@toronto_crime_data used in this study is sourced from @opendatatoronto and covers the period between 2014 and 2023. It includes detailed records of various crime types such as Assault, Auto Theft, Break and Enter, Robbery, Theft Over, Homicide, and Shooting & Breakenter across 158 neighborhoods in Toronto. Population data for each neighborhood is also included, enabling an analysis of the relationship between population density and crime frequency.
+Following @Oliveira argument that crime increases nonlinearly with population size, particularly in more populated areas, this analysis also considers the nonlinear nature of crime frequency in Toronto neighborhoods. Crime rates per 100,000 residents were used to compare neighborhoods with different population sizes, allowing for a more accurate understanding of crime dynamics. Additionally, the dataset includes the crime rate per 100,000 residents, which is calculated using population estimates from Environics Analytics.The rate is determined by dividing the crime count by the population and multiplying by 100,000, giving a per capita measure of crime annually. It allows more accurate comparisons of crime levels across areas with different population sizes. Unlike raw crime counts, crime rates offer a more balanced comparison over time as they account for population changes in the area.
+The data is analyzed in R (@citeR), using packages such as Tidyverse (@tidyverse), Httr (@httr), and ggplot2 (@ggplot2) in order to visualize the data and show important information intuitively.
+@fig-rawdata shows 
+
+
+
+```{r}
+#| label: fig-rawdata
+#| fig-cap: the glimpse of the raw data
+#| echo: false
+crime_data <- read.csv(here::here("data/raw_data/raw_crime_data.csv"))
+crime_data <- crime_data |> select(HOOD_ID, AREA_NAME, POPULATION_2023, ASSAULT_2023, ASSAULT_RATE_2023)
+kable(head(crime_data))
+```
+\newpage
+
+# Crime Rates Over the Past Decade
+In order to see the overall crime rate in Toronto. The average crime rate over the 158 neighbourhood is applied to visualize @fig-rates. @fig-rates presents a depiction of how various crime types have evolved from 2014 to 2023, particularly auto theft and break-and-enter offenses. Assault remains the most prevalent crime, while homicide and robbery rates have been relatively stable. @Oliveira work suggests that theft often increases superlinearly with population size, and Toronto’s recent surge in auto theft may reflect this pattern.The sharp increase in property-related crimes, such as break-and-enters, could also indicate broader economic and social shifts that align with similar trends observed in other cities globally (@Oliveira).
+
+The data reveals a marked increase in auto theft and break-and-enter crimes, while shooting and homicide rates have remained relatively low and stable. The rise in auto theft may be attributed to increased access to technology, while economic downturns might explain the surge in property-related crimes like break and enters.
+It highlights key trends in crimes such as **Assault, Auto Theft, Bike Theft, Break and Enters, Homicide, Robbery, Shooting,** and **Theft Over**, with each category visually represented by distinct colored lines. One of the most striking observations is the consistently high rate of **Assault** (represented by the red line), which has maintained its position as the most prevalent crime throughout the period. While the rate remained relatively stable between 2014 and 2020, it experienced a notable increase starting in 2022, reflecting a potentially alarming trend that may call for increased public safety measures or changes in law enforcement focus.
+In contrast, **Auto Theft** (brown line) shows one of the sharpest upward trajectories, particularly after 2020. This rise in auto-related crime could be indicative of broader societal or economic shifts, such as changes in vehicle accessibility, security measures, or even the impact of the COVID-19 pandemic, which has affected economic stability and possibly driven up theft-related crimes. The stark increase in auto theft from 2021 onward could suggest an emerging challenge for Toronto’s law enforcement and policymakers as they respond to these shifts.
+Meanwhile, **Break and Enters** (green line) and **Bike Theft** (also green) exhibit moderate fluctuations over the years, with **Bike Theft** showing a noticeable increase post-2021. These fluctuations in property crimes could be influenced by a range of factors, including urban development, changes in housing density, and public awareness campaigns promoting better security practices. Other crime types like **Homicide, Robbery, Shooting,** and **Theft Over** display relatively low rates and less volatility, suggesting that these categories, while serious, have not seen significant recent surges.
+The data presented in @fig-rates provides an essential foundation for discussions around urban crime in Toronto. It allows us to visualize the persistence and emergence of specific crime types over time, highlighting areas where intervention may be most necessary. For instance, the increasing rates of **Auto Theft** and **Assault** should be a priority for policymakers and law enforcement agencies. The graph also reinforces the importance of data-driven decision-making in urban planning and crime prevention, as visualizing trends over time can reveal patterns and shifts that may not be immediately apparent in static data snapshots. @fig-rates serves as a powerful tool for understanding Toronto’s crime landscape, emphasizing the need for continued monitoring and adaptive strategies in response to evolving crime dynamics.
+
+
+```{r}
+#| label: fig-rates
+#| fig-cap: the crime rates for differnet crimes in Toronto over time
+#| echo: false
+
+# Load necessary data
+crime_long <- read.csv(here::here("data/analysis_data/toronto_crime_average_rates.csv"))
+
+# Plot the data using ggplot2
+ggplot(crime_long, aes(x = Year, y = value, color = Crime_Type, group = Crime_Type)) +
+  geom_line(linewidth = 1) +  # Use `linewidth` instead of `size` for lines
+  geom_point(size = 2) +  # Points still use `size`
+  labs(title = "Average Crime Rates in Toronto Over Time",
+       x = "Year", y = "Average Crime Rate per 100,000 population",
+       color = "Crime Type") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))  # Rotate x-axis labels
+```
+\newpage
+
+#Results
+## Toronto Population Distribution
+```{r, fig.width=10, fig.height=8}
+#| label: fig-Population
+#| fig-cap: Population distribution in Toronto
+#| echo: false
+#| warning: false
+#| message: false
+
+crime_data_sf<- readRDS(here::here("data/analysis_data/cleaning_crime_data.rds"))
+ggplot(crime_data_sf) +
+  geom_sf(aes(fill = POPULATION_2023), color = "black", alpha = 0.9) +  
+  scale_fill_gradient(low = "#d3e5ff", high = "#08306b", name = "Population") +  
+  geom_text(aes(label = HOOD_ID, geometry = geometry), 
+            stat = "sf_coordinates", size = 4, color = "white", check_overlap = TRUE) + 
+  labs(title = "Toronto Neighbourhood Population Map",
+       subtitle = "Based on 2023 Population",
+       x = "Longitude", y = "Latitude") +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),  
+    plot.title = element_text(size = 16, face = "bold"), 
+    plot.subtitle = element_text(size = 12)  
+  )
+```
+
+
+
+```{r, fig.width=10, fig.height=8}
+#| label: fig-percrime
+#| fig-cap: a faceted map to visualize different crimes in 2023 by neighborhood
+#| echo: false
+#| warning: false
+#| message: false
+
+crime_long_1 <- read_rds(here::here("data/analysis_data/cleaning_crime_count.rds"))
+ggplot(crime_long_1) +
+  geom_sf(aes(fill = Crime_Count), color = "black", size = 0.2, alpha = 1) +  
+  scale_fill_gradientn(colors = c("white", "lightpink", "red", "darkred"),
+                       values = scales::rescale(c(0, 10, 50, 100, max(crime_long_1$Crime_Count))),
+                       name = "Crime Count") + 
+  facet_wrap(~ Crime_Type) +
+  labs(title = "Crime Rates in 2023 by Neighborhood",
+       subtitle = "Visualized for Multiple Crime Types",
+       fill = "Crime Count") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),  
+        panel.grid = element_blank(),   
+        strip.text = element_text(size = 14, face = "bold")) 
+```
+\newpage
+##Geographic Distribution of Crime
+A geographic heatmap of Toronto’s crime shows a higher concentration of crimes in areas with higher population densities, particularly in economically disadvantaged neighborhoods. This finding shows that population size is a strong predictor of crime, with more densely populated areas experiencing higher crime rates. In Toronto, eastern neighborhoods report higher assault and robbery rates than western, more affluent areas.
+
+## Neighborhood Analysis
+The analysis of crime frequency by neighborhood over a ten-year span shows that certain neighborhoods, such as Moss Park and Kensington-Chinatown, rank among the highest in crime occurrence (@fig-rank). Conversely, neighborhoods like Kingsway South and Markland Wood have consistently remained among the safest. These trends indicate that areas with lower socioeconomic status and higher population densities are more prone to higher crime rates, reflecting similar patterns observed in other major cities.
+
+```{r}
+#| label: fig-rank
+#| fig-cap: Visualize those safestest and most crime porne neighbourhood
+#| echo: false
+#| warning: false
+#| message: false
+
+top_10_neighborhoods_consistent <- read.csv(here::here("data/analysis_data/top_10_neighborhoods_consistent.csv"))
+bottom_10_neighborhoods_consistent<- read.csv(here::here("data/analysis_data/bottom_10_neighborhoods_consistent.csv"))
+
+ggplot(top_10_neighborhoods_consistent, aes(x = reorder(Neighborhood_ID_Name, Average_Rank), y = Average_Rank)) +
+  geom_bar(stat = "identity", fill = "tomato", width = 0.7) + 
+  coord_flip() +  
+  labs(title = "Top 10 Crime Prone Neighborhoods (2014-2023)",
+       x = "Neighborhood", 
+       y = "Average Rank") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12, face = "bold"), 
+    axis.text = element_text(size = 10),  
+    axis.title = element_text(size = 12),  
+    panel.grid.minor = element_blank(),  
+    panel.grid.major.x = element_blank(),  
+    panel.grid.major.y = element_line(color = "gray", linetype = "dashed")  
+  )
+
+ggplot(bottom_10_neighborhoods_consistent, aes(x = reorder(Neighborhood_ID_Name, -Average_Rank), y = Average_Rank)) +
+  geom_bar(stat = "identity", fill = "steelblue", width = 0.7) +  
+  coord_flip() + 
+  labs(title = "Top 10 Safest Neighborhoods (2014-2023)",
+       x = "Neighborhood", 
+       y = "Average Rank") +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),  
+    axis.text = element_text(size = 10),  
+    axis.title = element_text(size = 12),  
+    panel.grid.minor = element_blank(),  
+    panel.grid.major.x = element_blank(),  
+    panel.grid.major.y = element_line(color = "gray", linetype = "dashed")  
+  )
+```
+\newpage
+
+# Discussion
+
+## First discussion point {#sec-first-point}
+The increasing trend in crimes like auto theft and assault calls for immediate attention from policymakers. As shown in the data, crime rates do not arise uniformly across all neighborhoods but are concentrated in specific areas. This concentration suggests that socioeconomic factors, along with population density, play a significant role in the prevalence of crime. The sharp increase in auto theft post-2020 highlights the need for enhanced security measures, while the stable yet high assault rates point to the need for sustained law enforcement efforts in vulnerable neighborhoods.
+
+If my paper were 10 pages, then should be be at least 2.5 pages. The discussion is a chance to show off what you know and what you learnt from all this. 
+## Second discussion point
+
+## Third discussion point
+
+## Weaknesses and next steps
+In conclusion, the data illustrates a clear correlation between population density and crime frequency in Toronto. The most affected neighborhoods tend to be those with higher population densities and economic disadvantages. This analysis underscores the importance of using data-driven approaches to inform policy decisions, especially when it comes to resource allocation for crime prevention and community support.
+
+\newpage
+During the process, LLM is used for searching literatures.
+
+\newpage
+# References
+
+
