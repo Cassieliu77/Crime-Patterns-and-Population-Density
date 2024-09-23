@@ -1,12 +1,10 @@
 #### Preamble ####
-# Purpose: Download the needed dataset and save it.
+# Purpose: Download the needed dataset
 # Author: Yongqi Liu
 # Date: 20 Sep 2024 
 # Contact: cassieliu.liu@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: Find the dataset called "About Neighborhood Crime Rates" on Open Data Toronto
-# Any other information needed? NA
-
 
 #### Workspace setup ####
 library(opendatatoronto)
