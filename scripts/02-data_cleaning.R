@@ -144,6 +144,6 @@ saveRDS(crime_data_sf, "data/analysis_data/cleaning_crime_data.rds")
 write_csv(crime_data_sf, "data/analysis_data/cleaning_crime_data.csv")
 write_csv(crime_long, "data/analysis_data/toronto_crime_average_rates.csv")
 write_rds(crime_long_1, "data/analysis_data/cleaning_crime_count.rds")
-write_csv(top_10_neighborhoods_consistent, "data/analysis_data/top_10_neighborhoods_consistent.csv")
-write_csv(bottom_10_neighborhoods_consistent, "data/analysis_data/bottom_10_neighborhoods_consistent.csv")
+write_csv(top_10_neighborhoods_consistent, "data/analysis_data/top_10_neighborhoods.csv")
+write_csv(bottom_10_neighborhoods_consistent, "data/analysis_data/bottom_10_neighborhoods.csv")
 
