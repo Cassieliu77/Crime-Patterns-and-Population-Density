@@ -3,10 +3,10 @@ title: "Crime Frequency and Population Density: Analyzing Crime Rates in Toronto
 author: 
   - Yongqi Liu
 thanks: "Code and data are available at: https://github.com/Cassieliu77/starter_folder-master.git."
-date: 24 September 2024
+date: 23 September 2024
 date-format: long
 toc: true 
-abstract: "First sentence. Second sentence. Third sentence. Fourth sentence."
+abstract: "This paper investigates the relationship between population density and crime rates in Toronto neighborhoods from 2014 to 2023. Using data from the Toronto Police Services and population estimates, the study explores how crime patterns vary across different areas of the city.This research underscores the importance of targeted crime prevention strategies and data-driven policymaking to address the specific needs of these crime-prone neighborhoods. Additionally, the study discusses broader societal factors influencing crime trends, including the potential impacts of economic instability and technological changes."
 format: pdf
 number-sections: true
 bibliography: references.bib
@@ -194,8 +194,7 @@ If my paper were 10 pages, then should be be at least 2.5 pages. The discussion 
 ## Weaknesses and next steps
 In conclusion, the data illustrates a clear correlation between population density and crime frequency in Toronto. The most affected neighborhoods tend to be those with higher population densities and economic disadvantages. This analysis underscores the importance of using data-driven approaches to inform policy decisions, especially when it comes to resource allocation for crime prevention and community support.
 
-\newpage
-During the process, LLM is used for searching literatures.
+
 
 \newpage
 # References
