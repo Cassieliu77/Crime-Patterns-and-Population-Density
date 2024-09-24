@@ -2,7 +2,7 @@
 
 ## Overview
 
-This repo provides students with a foundation for their own projects associated with *Telling Stories with Data*. You do not need every aspect for every paper and you should delete aspects that you do not need.
+This repo shows the research on the crime frequency and population in Toronto. 
 
 
 ## File Structure
@@ -19,7 +19,7 @@ The repo is structured as:
 
 ## Statement on LLM usage
 
-The simulation part of the code was written with the help of Chat-GPT 4.0. Besides, the search of related literature, the writing of the abstract for this paper is under the help of Chat-GPT 4.0. The complete chat history has been put in the usage folder.
+The simulation part of the code was written with the help of Chat-GPT 4.0. Besides, the search of related literature, the writing of the abstract for this paper is under the help of Chat-GPT 4.0. The complete chat history has been added to the usage folder.
 
 ## Some checks
 
