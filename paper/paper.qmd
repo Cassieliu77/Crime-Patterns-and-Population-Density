@@ -29,7 +29,7 @@ library(gt)
 ```
 
 # Introduction
-Urban crime trends have long been studied due to their impact on social stability and policy-making. In Toronto, crime rates vary significantly across neighborhoods, often influenced by factors such as population density and economic disparity. This paper focuses on analyzing the trends in crime frequency across different types of crimes, using data from 2014 to 2023. The objective is to determine how crime patterns have changed over time and which neighborhoods are most affected. The result shows a icnreasing trend in crime rates. All the analysis in the paper is conducted in @citeR. (Need to write more!)
+Urban crime trends have long been studied due to their impact on social stability and policy-making. In Toronto, crime rates vary significantly across neighborhoods, often influenced by factors such as population density and economic disparity. This paper focuses on analyzing the trends in crime frequency across different types of crimes, using data from 2014 to 2023. The objective is to determine how crime patterns have changed over time and which neighborhoods are most affected. The result shows a increasing trend in crime rates. All the analysis in the paper is conducted in @citeR, @openai2023chatgpt is used in this research paper to help simulate data. (Need to write more!)
 
 # Data {#sec-data}
 ## Raw Data
