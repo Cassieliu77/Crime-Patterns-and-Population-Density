@@ -36,7 +36,6 @@ crime_data_sf <- lapply(coordinates_list, function(coords) {
 })
 crime_data$geometry <- st_sfc(crime_data_sf)
 crime_data_sf <- st_as_sf(crime_data)
-
 print(st_geometry(crime_data_sf))
 
 # Get the average crime rate in the whole Toronto for the line chart
@@ -52,12 +51,13 @@ crime_long <- average_rates %>%
   mutate(Year = as.numeric(Year), 
          Crime_Type = str_to_title(Crime_Type),  
          Crime_Type = case_when( 
-           Crime_Type == "Breakenter" ~ "Break and Enters",
+           Crime_Type == "Breakenter" ~ "Break and Enter",
            Crime_Type == "Autotheft" ~ "Auto Theft",
            Crime_Type == "Biketheft" ~ "Bike Theft" ,
            Crime_Type == "Theftover" ~ "Theft Over" ,
            TRUE ~ Crime_Type
          )) %>% filter(Crime_Type != "Theftfrommv") 
+crime_long<- crime_long %>% rename(Average_Crime_Rate=value)
 head(crime_long)
 
 # Clean the dataset for the combination of maps for per type of crime
@@ -145,7 +145,7 @@ print(bottom_10_neighborhoods_consistent)
 
 #### Save data ####
 saveRDS(crime_data_sf, "data/analysis_data/cleaning_crime_data.rds")
-write_csv(crime_data_sf, "data/analysis_data/cleaning_crime_data.csv")
+#write_csv(crime_data_sf, "data/analysis_data/cleaning_crime_data.csv")
 write_csv(crime_long, "data/analysis_data/toronto_crime_average_rates.csv")
 write_rds(crime_long_1, "data/analysis_data/cleaning_crime_count.rds")
 write_csv(top_10_neighborhoods_consistent, "data/analysis_data/top_10_neighborhoods.csv")
