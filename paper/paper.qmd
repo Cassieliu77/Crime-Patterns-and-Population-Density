@@ -1,5 +1,5 @@
 ---
-title: "ssessing Population Density and Crime Patterns in Toronto Neighborhoods (2014–2023)"
+title: "Assessing Population Density and Crime Patterns in Toronto Neighborhoods (2014–2023)"
 author: 
   - Yongqi Liu
 thanks: "Code and data are available at:https://github.com/Cassieliu77/Crime-Frequency-and-Population-Density.git."
