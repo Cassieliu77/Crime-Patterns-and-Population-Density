@@ -80,7 +80,8 @@ crime_long_1 <- crime_data_sf %>%
   )) %>%
   drop_na(Crime_Count)  # Remove rows where Crime_Count is NA
 # Check the result
-head(crime_long_1)
+glimpse(crime_long_1)
+
 
 #Get the crime count for different neighbourhood in different years
 crime_summary_multiple_years <- crime_data %>%
