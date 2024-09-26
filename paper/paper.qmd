@@ -141,6 +141,35 @@ ggplot(crime_data_sf) +
 
 ## Geographic Distribution of Crime
 Based on @fig-Population, @fig-percrime represents a higher concentration of crimes in areas with higher population densities, particularly in economically disadvantaged neighborhoods. Those gray areas mean no crime was reported. From the map showing **Homicide**, it This finding shows that population size is a strong predictor of crime, with more densely populated areas experiencing higher crime rates. In Toronto, eastern neighborhoods report higher assault and robbery rates than western, more affluent areas.
+```{r,fig.width=10, fig.height=8}
+#| label: fig-crimeandpopulation
+#| fig-cap: 2023 Crime Trend with Population
+#| echo: false
+#| warning: false
+#| message: false
+crime_long_1 <- read_rds(here::here("data/analysis_data/cleaning_crime_count.rds"))
+
+ggplot(crime_long_1, aes(x = Crime_Count, y = POPULATION_2023)) +
+  geom_point(aes(color = Crime_Type), size = 2, alpha = 0.8) +  # Adjust point size and transparency for better visibility
+  geom_smooth(method = "lm", se = FALSE, color = "black", size = 1) +  # Keep linear trendline with original method
+  scale_color_manual(values = c("lightpink", "red", "grey", "blue", "orange", "skyblue", "brown", "yellow")) +  # Customize colors for crime types
+  scale_x_continuous(limits = c(0, 200), breaks = seq(0, 200, by = 50)) +  # Set horizontal axis limits from 0 to 200 with breaks
+  facet_wrap(~ Crime_Type) +  # Split the scatterplot by crime type
+  labs(title = "Crime Count vs. Population by Neighborhoods",
+       subtitle = "Visualized for Multiple Crime Types",
+       x = "Crime Count",  
+       y = "Population",
+       color = "Crime Type") +
+  theme_minimal(base_size = 15) +  # Increase base size for text readability
+  theme(axis.title = element_text(size = 14),  
+        panel.grid.major = element_line(color = "gray90"),  # Add subtle grid lines for clarity
+        panel.grid.minor = element_blank(),   
+        strip.text = element_text(size = 16, face = "bold"),  # Emphasize facet labels
+        legend.position = "bottom",  # Move legend to the bottom for a cleaner layout
+        legend.title = element_text(face = "bold"),
+        plot.title = element_text(face = "bold", hjust = 0.5),  # Center align the title
+        plot.subtitle = element_text(hjust = 0.5))  # Center align the subtitle
+```
 
 ```{r, fig.width=10, fig.height=8}
 #| label: fig-percrime
