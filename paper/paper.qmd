@@ -1,5 +1,5 @@
 ---
-title: "Exploring the Impact of Population Density on Crime Distribution in Toronto Neighborhoods (2014–2023)"
+title: "ssessing Population Density and Crime Patterns in Toronto Neighborhoods (2014–2023)"
 author: 
   - Yongqi Liu
 thanks: "Code and data are available at:https://github.com/Cassieliu77/Crime-Frequency-and-Population-Density.git."
@@ -34,33 +34,33 @@ library(lintr)
 Urban crime has long been a focus for researchers and policymakers due to its profound impact on public safety and quality of life. In a rapidly growing metropolis like Toronto, population density plays a significant role in shaping the spatial distribution of crime. This study explores how population density correlates with crime frequency across Toronto neighborhoods between 2014 and 2023. Additionally, the research examines the influence of socioeconomic factors in high-density areas, aiming to identify neighborhoods that require targeted crime prevention strategies. Through this analysis, we hope to shed light on the dynamics of urban crime in Toronto and contribute to more effective policies for mitigating crime in high-density areas. All of the analyses in the paper are conducted in @citeR.
 
 # Data {#sec-data}
-## Data Source
-The Neighborhood Crime Rates dataset, obtained from @opendatatoronto, spans from 2014 to 2023 and covers 158 Toronto neighborhoods.It is designed to offer communities insights into public safety and awareness. The data provided to the Toronto Police Service by reporting parties is preliminary and may not have undergone full verification at the time of publication. The dataset includes various crime types such as Assault, Auto Theft, Robbery, Break and Enter, Bike Theft, Shooting, and Homicide. According to the standard definition by Statistics Canada, the crime rate is calculated as the number of crimes per 100,000 people each year. Besides, crime counts per crime type per year are also shown in the data. In @opendatatoronto, another variable of interest *POPULATION_2023* refers to the population in the 2023 year in each neighborhood, enabling the analysis of the relationship between population density and crime frequency. Geometry column is transformed into spatial data to build up the Toronto city map to observe population density and crime distribution. 
+## Data Overview
+The Neighborhood Crime Rates dataset, obtained from @opendatatoronto, spans from 2014 to 2023 and covers 158 Toronto neighborhoods.It is designed to offer communities insights into public safety and awareness. The data provided to the Toronto Police Service by reporting parties is preliminary and may not have undergone full verification at the time of publication. The dataset includes various crime types such as Assault, Auto Theft, Robbery, Break and Enter, Bike Theft, Shooting, and Homicide. According to the standard definition by Statistics Canada, the crime rate is calculated as the number of crimes per 100,000 people each year. Besides, crime counts per crime type per year are also shown in the data. In @opendatatoronto, another variable of interest *Population 2023* refers to the population in the 2023 year in each neighborhood, enabling the analysis of the relationship between population density and crime frequency. Geometry column is transformed into spatial data to build up the Toronto city map to observe population density and crime distribution. @tbl-rawdata gives us a glimpse of how the dataset looks. Each neighborhood is identified by its *Area Name* and a unique *Hood ID*. 
 
-As for the measurement, the crime rate is measured using population estimates from Environics Analytics, which is in line with the standard definition by Statistics Canada. The dataset records crimes that got Toronto Police intervention. This metric allows for fairer comparisons between neighborhoods with different population sizes. Also note that this dataset incorporates data for the new structure of the 158 City of Toronto neighborhoods, enabling a more comprehensive geographic analysis, and it does not contain occurrences of crime that were deemed “unfounded”. Fields have been updated to reflect the new structure of the 158 City of Toronto neighborhoods.Population figures only account for the resident population in each region and do not include temporary populations like commuters or business patrons. To protect the privacy of those involved, the locations of crime incidents have been intentionally shifted to the nearest road intersection node. As such, all location data should be regarded as approximate, and users are cautioned not to interpret these locations as linked to any specific address or individual.
-
-Crime rates offer a more balanced comparison over time as they account for population changes in the area and give us a fairer way to see the crime trends in the past decade, which explains why a similar dataset called "Police Annual Statistical Report - Reported Crimes" is not be chosen as my dataset, which only contains the reported crime count for a certain year and a certain division, which lack a standard way to show the crime trends and spatial attribute to see the geography distribution.
-
-@fig-rawdata gives us a glimpse of how the dataset looks. Each neighborhood is identified by its *AREA_NAME* and a unique *HOOD_ID*. 
-
+The average crime rates represent the mean crime rate across 158 neighborhoods from 2014 to 2023, and were calculated to analyze long-term trends and highlight crime types that have seen significant increases. The variables *Crime Type* and *Crime Count* are based on 2023 data (@tbl-summary1).Each neighborhood’s average rank was determined by ranking all 158 neighborhoods based on their total annual crime count. A rank is assigned for each year, and the average rank over the past decade (2014–2023) is calculated by averaging these yearly ranks. A lower rank indicates a higher crime count. Summaries of the top 10 and bottom 10 ranked neighborhoods are provided in @tbl-summary2 and @tbl-summary4.
 
 ```{r}
-#| label: fig-rawdata
-#| fig-cap: A Lookup for the Raw Data
+#| label: tbl-rawdata
+#| tbl-cap: A Lookup for the Raw Data
 #| echo: false
 
 crime_data <- read.csv(here::here("data/raw_data/raw_crime_data.csv"))
-crime_data <- crime_data |> select(HOOD_ID, POPULATION_2023, ASSAULT_2023, ASSAULT_RATE_2023)
+crime_data <- crime_data |> 
+  select(HOOD_ID, POPULATION_2023, ASSAULT_2023, ASSAULT_RATE_2023)
+crime_data <- crime_data |> 
+  rename(
+    `Hood ID` = HOOD_ID,
+    `Population 2023` = POPULATION_2023,
+    `Assault 2023` = ASSAULT_2023,
+    `Assault Rate 2023` = ASSAULT_RATE_2023
+  )
+
 kable(head(crime_data))
 ```
 
-## New Variable Constructure
-The average crime rates represent the mean crime rate across 158 neighborhoods from 2014 to 2023, and were calculated to analyze long-term trends and highlight crime types that have seen significant increases. The variables *Crime_Type* and *Crime_Count* are based on 2023 data (@fig-summary1).
-
-Each neighborhood’s average rank was determined by ranking all 158 neighborhoods based on their total annual crime count. A rank is assigned for each year, and the average rank over the past decade (2014–2023) is calculated by averaging these yearly ranks. A lower rank indicates a higher crime count. Summaries of the top 10 and bottom 10 ranked neighborhoods are provided in @fig-summary2 and @fig-summary3.
 ```{r}
-#| label: fig-summary1
-#| fig-cap: Summary Table for the 2023 Crime Count
+#| label: tbl-summary1
+#| tbl-cap: Summary Table for the Crime Count in 2023
 #| echo: false
 #| warning: false
 #| message: false
@@ -69,47 +69,58 @@ crime_count <- readRDS(here::here("data/analysis_data/cleaning_crime_count.rds")
 crime_count_summary <- crime_count %>%
   st_drop_geometry() %>%  
   select(HOOD_ID, AREA_NAME, Crime_Type, Crime_Count)
+crime_count_summary <- crime_count_summary %>%
+  rename(
+    `Hood ID` = HOOD_ID,
+    `Area Name` = AREA_NAME,
+    `Crime Type` = Crime_Type,
+    `Crime Count` = Crime_Count)
 kable(head(crime_count_summary, 10))
 ```
 
 ```{r}
-#| label: fig-summary2
-#| fig-cap: Summary Table for Top10 Ranked Neighborhoods
+#| label: tbl-summary2
+#| tbl-cap: Summary Table for Top10 Crime-Prone Neighborhoods (2014-2023)
 #| echo: false
 #| warning: false
 #| message: false
 
 top_10_neighborhoods <- read.csv(here::here("data/analysis_data/top_10_neighborhoods.csv"))
-top_summary<-top_10_neighborhoods |> select(Neighborhood_ID_Name, Average_Rank)
+top_summary<-top_10_neighborhoods%>% rename(`Neighborhood ID and Name` = Neighborhood_ID_Name, `Average Rank` = Average_Rank) %>%
+  select(`Neighborhood ID and Name`, `Average Rank`)
 kable(top_summary)
 ```
 
-```{r}
-#| label: fig-summary3
-#| fig-cap: Summary Table for Bottom 10 Ranked Neighborhoods
-#| echo: false
-#| warning: false
-#| message: false
 
-bottom_10_neighborhoods<- read.csv(here::here("data/analysis_data/bottom_10_neighborhoods.csv"))
-bottom_summary<-bottom_10_neighborhoods |> select(Neighborhood_ID_Name, Average_Rank)
-kable(bottom_summary)
-```
+
+
+## Measurement
+As for the measurement, the crime rate is measured using population estimates from Environics Analytics, which is in line with the standard definition by Statistics Canada. The dataset records crimes that got Toronto Police intervention. This metric allows for fairer comparisons between neighborhoods with different population sizes. Also note that this dataset incorporates data for the new structure of the 158 City of Toronto neighborhoods, enabling a more comprehensive geographic analysis, and it does not contain occurrences of crime that were deemed “unfounded”. Fields have been updated to reflect the new structure of the 158 City of Toronto neighborhoods.Population figures only account for the resident population in each region and do not include temporary populations like commuters or business patrons. To protect the privacy of those involved, the locations of crime incidents have been intentionally shifted to the nearest road intersection node. As such, all location data should be regarded as approximate, and users are cautioned not to interpret these locations as linked to any specific address or individual.
+
+Crime rates offer a more balanced comparison over time as they account for population changes in the area and give us a fairer way to see the crime trends in the past decade, which explains why a similar dataset called "Police Annual Statistical Report - Reported Crimes" is not be chosen as my dataset, which only contains the reported crime count for a certain year and a certain division, which lack a standard way to show the crime trends and spatial attribute to see the geography distribution.
+
+
 
 \newpage
 # Results
 ## Crime Rates Over the Past Decade
-@fig-rates uses the variable *Average_Crime_Rate* (@fig-summary4) to show the crime rate trend between 2014 and 2023 and demonstrate the evolution of different crime types in the city of Toronto. It can be seen that the visualization reveals certain patterns in some specific crime types.
+@fig-rates uses the variable *Average Crime Rate* (@tbl-summary3) to show the crime rate trend between 2014 and 2023 and demonstrate the evolution of different crime types in the city of Toronto. It can be seen that the visualization reveals certain patterns in some specific crime types.
 
 ```{r}
-#| label: fig-summary4
-#| fig-cap: Average Crime Rate in Toronto
+#| label: tbl-summary3
+#| tbl-cap: Average Crime Rate in Toronto
 #| echo: false
 #| warning: false
 #| message: false
 
 average_crime_rate <- read.csv(here::here("data/analysis_data/toronto_crime_average_rates.csv"))
-#top_summary<-top_10_neighborhoods |> select(Neighborhood_ID_Name, Average_Rank)
+average_crime_rate <- average_crime_rate %>%
+  rename(
+    `Area Name` = AREA_NAME,
+    `Crime Type` = Crime_Type,
+    `Average Crime Rate` = Average_Crime_Rate
+  ) %>%
+  select(`Area Name`, Year, `Crime Type`, `Average Crime Rate`, )
 average_crime_rate |>
   slice(1:10) |>
   kable()
@@ -119,29 +130,30 @@ average_crime_rate |>
 
 ```{r}
 #| label: fig-rates
-#| fig-cap: Average Crime Rates in Toronto Over Time
+#| fig-cap: Average Crime Rates per 100,000 population in Toronto (2014-2023)
 #| echo: false
 #| warning: false
 #| message: false
-
-crime_long <- read.csv(here::here("data/analysis_data/toronto_crime_average_rates.csv"))
+crime_long<-read.csv(here::here("data/analysis_data/toronto_crime_average_rates.csv"))
 ggplot(crime_long, aes(x = Year, y = Average_Crime_Rate, color = Crime_Type, group = Crime_Type)) +
   geom_line(linewidth = 1) +  
   geom_point(size = 2) +  
-  labs(title = "Average Crime Rates in Toronto Over Time",
-       x = "Year", y = "Average Crime Rate per 100,000 population",
+  labs(title = "Average Crime Rate in Toronto (2014-2023)",
+       x = "Year", y = "Average Crime Rate ",
        color = "Crime Type") +
   theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))  
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "bottom",  
+        plot.title = element_text(face = "bold", hjust = 0.5))
 ```
 \newpage
 
 ## Toronto Population Density
-@fig-Population shows the population density in Toronto, constructed by using variable *POPULATION_2023* and geometry data. Higher saturation represents higher population density in 2023. Neighborhoods with lighter shading have smaller populations, such as neighborhood 12 and 13. Notably, neighborhoods 1 and 95 exhibit the darkest saturation, indicating the highest population density. In the following sections, we will explore whether these high-density neighborhoods correspond to areas that are more prone to crime.
+@fig-Population shows the population density in Toronto, constructed by using variable *Population 2023* and geometry data. Higher saturation represents higher population density in 2023. Neighborhoods with lighter shading have smaller populations, such as neighborhood 12 and 13. Notably, neighborhoods 1 and 95 exhibit the darkest saturation, indicating the highest population density. In the following sections, we will explore whether these high-density neighborhoods correspond to areas that are more prone to crime.
 
 ```{r, fig.width=12, fig.height=10}
 #| label: fig-Population
-#| fig-cap: Population Density in Toronto
+#| fig-cap: Toronto Population Density (2023)
 #| echo: false
 #| warning: false
 #| message: false
@@ -159,14 +171,12 @@ ggplot(crime_data_sf) +
   theme(
     panel.grid = element_blank(),  
     plot.title = element_text(size = 16, face = "bold"), 
-    plot.subtitle = element_text(size = 12)  )
+    plot.subtitle = element_text(size = 12)  ) 
 ```
 \newpage
 
 ## Relationship between Crime Count and Population 
 The scatterplots in @fig-crimeandpopulation illustrate the relationship between crime count and population for various crime types across Toronto neighborhoods in 2023. Each crime type is represented by a separate plot, and a linear trendline has been added to demonstrate the relationship between crime count and population size.
-
-
 ```{r,fig.width=8, fig.height=6}
 #| label: fig-crimeandpopulation
 #| fig-cap: Crime Count with Population in 2023
@@ -195,34 +205,29 @@ ggplot(crime_long_1, aes(x = Crime_Count, y = POPULATION_2023)) +
         plot.title = element_text(face = "bold", hjust = 0.5), 
         plot.subtitle = element_text(hjust = 0.5))  
 ```
-**Assault** and **Auto Theft** exhibit strong positive correlations with population, as indicated by the upward slope of the trendlines. This suggests that as the population of a neighborhood increases, the number of assaults and auto theft incidents tends to rise as well. **Break and Enter** shows a similar trend, with higher crime counts in neighborhoods with larger populations.
+**Assault** and **Auto Theft** exhibit strong positive correlations with population, as indicated by the upward slope of the trendlines. This suggests that as the population of a neighborhood increases, the number of assaults and auto theft incidents tends to rise as well. **Break and Enter** shows a similar trend, with higher crime counts in neighborhoods with larger populations. **Robbery** and **Theft Over** also show a positive relationship with population, although the correlation is not as strong as it is for Assault or Auto Theft. **Bike Theft**, while showing an upward trend, appears more dispersed, indicating a weaker correlation between population size and the number of incidents. 
+ 
+Overall, the graph highlights that property crimes, such as **Auto Theft**, and **Break and Enter**, are more likely to increase with population density, whereas violent crimes like **Homicide** and **Shooting** remain relatively low in Toronto regardless of neighborhood size.
 
-In contrast, crimes such as **Homicide** and **Shooting** display much smaller crime counts overall, and their trendlines suggest weaker correlations with population size. These crimes are less frequent, and the relationship between population and crime count is less pronounced compared to property crimes. 
+From @fig-crimeandpopulation, most of these scatter plots represent upward trend between Crime Count and Population is shown. It seems that the lack of cases in **Shooting** and **Homicide** makes most dots overlap together. These crimes are less frequent, and the relationship between population and crime count is less pronounced compared to property crimes. 
 
-**Robbery** and **Theft Over** also show a positive relationship with population, although the correlation is not as strong as it is for Assault or Auto Theft. **Bike Theft**, while showing an upward trend, appears more dispersed, indicating a weaker correlation between population size and the number of incidents. 
-
-Overall, the graph highlights that property crimes, such as **Assault**, **Auto Theft**, and **Break and Enter**, are more likely to increase with population density, whereas violent crimes like **Homicide** and **Shooting** remain relatively low regardless of neighborhood size.
-From @fig-crimeandpopulation, these scatter plots represent upward trend between Crime Count and Population is shown. It seems that the lack of cases in **Shooting** and **Homicide** makes most dots overlap together. So, the map for each crime is created respectively to help us see the distribution of these 2 particular crime types.
-
-As for the Homicide and Shooting,.............
+Consequently, extra maps are shown in @fig-homicide and @fig-shooting to display these two relatively rare crime types' occurrence in particular neighborhoods. The size of red dot represents for the crime count and is marked on the area they occur. It can be observed that most larger size dots appear in the neighborhoods with darker shading, and most of neighborhoods with lowest saturation blue does not have a reported homicide or shooting case.
 
 ```{r,fig.width=10, fig.height=8}
 #| label: fig-homicide
-#| fig-cap: 2023 Homicide Distribution
+#| fig-cap: Homicide Count Distribution (2023)
 #| echo: false
 #| warning: false
 #| message: false
 
 homicide_data <- crime_long_1 %>%
   filter(Crime_Type == "Homicide")
-# Check the filtered data
-#head(homicide_data)
 ggplot(crime_data_sf) +
-  geom_sf(aes(fill = POPULATION_2023), color = "black", alpha = 0.8) +  # Population density map with slight transparency
-  scale_fill_gradient(low = "#d3e5ff", high = "#08306b", name = "Population") +  # Softer gradient for better visuals
-  geom_jitter(data = homicide_data, aes(geometry = geometry, size = Crime_Count),  # Use geom_jitter to avoid overlapping dots
-              color = "red", stat = "sf_coordinates", alpha = 0.6, width = 0.002, height = 0.002) +  # Add jitter and adjust transparency
-  scale_size_continuous(name = "Homicide Count", range = c(2, 10)) +  # Dot sizes for clearer representation of crime count
+  geom_sf(aes(fill = POPULATION_2023), color = "black", alpha = 0.8) + 
+  scale_fill_gradient(low = "#d3e5ff", high = "#08306b", name = "Population") +  
+  geom_jitter(data = homicide_data, aes(geometry = geometry, size = Crime_Count),  
+              color = "red", stat = "sf_coordinates", alpha = 0.6, width = 0.002, height = 0.002) + 
+  scale_size_continuous(name = "Homicide Count", range = c(2, 10)) + 
   labs(title = "Homicide Count and Population Density",
        subtitle = "By Neighborhoods",
        x = "Longitude", y = "Latitude") +
@@ -233,54 +238,49 @@ ggplot(crime_data_sf) +
     plot.title = element_text(size = 18, face = "bold", hjust = 0.5),  
     plot.subtitle = element_text(size = 14, hjust = 0.5),  
     legend.position = "bottom", 
-    legend.title = element_text(face = "bold", size = 6),  
-    legend.text = element_text(size = 6)  
-  ) +
+    legend.title = element_text(face = "bold", size = 14),  
+    legend.text = element_text(size = 10)) +
   guides(size = guide_legend(override.aes = list(alpha = 1))) 
-
 ```
-
 
 ```{r,fig.width=10, fig.height=8}
 #| label: fig-shooting
-#| fig-cap: Shooting Count Distribution in 2023
+#| fig-cap: Shooting Count Distribution (2023)
 #| echo: false
 #| warning: false
 #| message: false
 
-# Filter for Shooting data
 shooting_data <- crime_long_1 %>%
   filter(Crime_Type == "Shooting")
 
 # Create a population density map with shooting crime count
 ggplot(crime_data_sf) +
-  geom_sf(aes(fill = POPULATION_2023), color = "black", alpha = 0.9) +  # Population density map
-  scale_fill_gradient(low = "#d3e5ff", high = "#08306b", name = "Population") +  # Color gradient for population density
-  geom_jitter(data = shooting_data, aes(geometry = geometry, size = Crime_Count),  # Add jitter to avoid overlap
-              color = "red", stat = "sf_coordinates", alpha = 0.6, width = 0.002, height = 0.002) +  # Jitter points
-  scale_size_continuous(name = "Shooting Count", range = c(1, 10), breaks = c(5, 10, 15, 20)) +  # Set dot size range and breaks
+  geom_sf(aes(fill = POPULATION_2023), color = "black", alpha = 0.9) +  
+  scale_fill_gradient(low = "#d3e5ff", high = "#08306b", name = "Population") +  
+  geom_jitter(data = shooting_data, aes(geometry = geometry, size = Crime_Count),  
+              color = "red", stat = "sf_coordinates", alpha = 0.6, width = 0.002, height = 0.002) +  
+  scale_size_continuous(name = "Shooting Count", range = c(1, 10), breaks = c(5, 10, 15, 20)) +  
   labs(title = "Shooting Count and Population Density",
        subtitle = "By Neighborhood",
        x = "Longitude", y = "Latitude") +
   theme_minimal() +
   theme(
-    panel.grid = element_blank(),  # Remove grid
+    panel.grid = element_blank(),  
     plot.title = element_text(size = 18, face = "bold"), 
     plot.subtitle = element_text(size = 14),
-    legend.position = "bottom",  # Move legend to bottom
-    legend.title = element_text(face = "bold")
-  ) +
-  guides(size = guide_legend(override.aes = list(alpha = 1)))  # Adjust legend for point size
+    legend.position = "bottom",  
+    legend.title = element_text(face = "bold")) +
+  guides(size = guide_legend(override.aes = list(alpha = 1), position = "bottom"))
 ```
 
 \newpage
 
 ## Neighborhood Analysis
-After looking at the trend of crimes in the whole Toronto, it is more important to take a look into those small neighborhoods. Top10 safest and Top10 Crime Prone neighborhoods are shown in the following content. It give police and security department to take different measures to differnt neighborhoods.Top 1 crime prone neighborhoods is West Humber-Clairville. Based on the map, it lcoates  
+After looking at the trend of crimes in the whole Toronto, it is more important to take a look into those small neighborhoods. The rank here is counted based on the total crime count for each neighborhood each year. Higher rank implies higher crime count on average. Top10 safest and Top10 Crime-Prone neighborhoods are shown in the following content. It give police and security department to take different measures to different neighborhoods.Top 1 crime-prone neighborhoods is West Humber-Clairville. Based on the map, it locates upper-left corner of the city map. Besides, as we noted in @fig-Population, both of the most density neighborhoods 1 and 95(Annex) show in the top 10 crime-prone ranked neighborhoods. 
 
 ```{r}
 #| label: fig-rank-crime
-#| fig-cap: Top10 Ranked Crime Prone Neigborhoods Based on Crime Count
+#| fig-cap: Top10 Ranked Crime-Prone Neigborhoods (2014-2023)
 #| echo: false
 #| warning: false
 #| message: false
@@ -288,58 +288,53 @@ After looking at the trend of crimes in the whole Toronto, it is more important 
 ggplot(top_10_neighborhoods, aes(x = reorder(Neighborhood_ID_Name, Average_Rank), y = Average_Rank)) +
   geom_bar(stat = "identity", fill = "tomato", width = 0.7) + 
   coord_flip() +  
-  labs(title = "Top 10 Crime Prone Neighborhoods ",
-       x = "Neighborhood", 
-       y = "Average Rank (2014-2023)") +
+  labs(title = "Top 10 Crime-Prone Neighborhoods",
+       x = "Neighborhood ID and Name", 
+       y = "Average Rank") +
   theme_minimal() +
   theme(
-    plot.title = element_text(size = 12, face = "bold"), 
+    plot.title = element_text(size = 11, face = "bold"), 
     axis.text = element_text(size = 8),  
-    axis.title = element_text(size = 12),  
+    axis.title = element_text(size = 11,face="bold"),  
     panel.grid.minor = element_blank(),  
     panel.grid.major.x = element_blank(),  
     panel.grid.major.y = element_line(color = "gray", linetype = "dashed")  
   )
 ```
 
-
 ```{r}
-#| label: fig-rank-safe
-#| fig-cap: Top10 Ranked Safest Neigborhoods Based on Crime Count
+#| label: tbl-summary4
+#| tbl-cap: Top10 Ranked Safest Neigborhoods (2014-2023)
 #| echo: false
 #| warning: false
 #| message: false
-ggplot(bottom_10_neighborhoods, aes(x = reorder(Neighborhood_ID_Name, -Average_Rank), y = Average_Rank)) +
-  geom_bar(stat = "identity", fill = "steelblue", width = 0.7) +  
-  coord_flip() + 
-  labs(title = "Top 10 Safest Neighborhoods",
-       x = "Neighborhood", 
-       y = "Average Rank(2014-2023)") +
-  theme_minimal() +
-  theme(
-    plot.title = element_text(size = 12, face = "bold"),  
-    axis.text = element_text(size = 8),  
-    axis.title = element_text(size = 12),  
-    panel.grid.minor = element_blank(),  
-    panel.grid.major.x = element_blank(),  
-    panel.grid.major.y = element_line(color = "gray", linetype = "dashed")  
-  )
+
+bottom_10_neighborhoods<- read.csv(here::here("data/analysis_data/bottom_10_neighborhoods.csv"))
+bottom_summary <- bottom_10_neighborhoods %>%
+  rename(`Neighborhood ID and Name` = Neighborhood_ID_Name, `Average Rank` = Average_Rank) %>%
+  select(`Neighborhood ID and Name`, `Average Rank`)
+kable(bottom_summary)
 ```
+
 In @fig-rank-crime, neighborhoods such as West Humber-Clairville, York University Heights, and Wellington Place have consistently ranked among the top 10 crime-prone areas over the past decade. These neighborhoods are characterized by higher population densities and socioeconomic challenges, making them more vulnerable to crime. The increasing trend in auto theft and assault in these neighborhoods underscores the need for targeted interventions and enhanced security measures.
-In contrast,@fig-rank-safe neighborhoods like Maple Leaf and Lambton Baby Point have consistently ranked as some of the safest areas in Toronto. These neighborhoods tend to have lower population densities and are more affluent, with better access to resources and community support. The stability of crime rates in these areas suggests that socioeconomic factors play a critical role in maintaining low crime levels.
+In contrast,@tbl-summary4 neighborhoods like Maple Leaf and Lambton Baby Point have consistently ranked as some of the safest areas in Toronto. These neighborhoods tend to have lower population densities and are more affluent, with better access to resources and community support. The stability of crime rates in these areas suggests that socioeconomic factors play a critical role in maintaining low crime levels.
 \newpage
 
 # Discussion
 
 ## Summary of Findings
-The analysis revealed significant variations in crime rates over time, particularly in property-related offenses such as Auto Theft and Break and Enter. Assault remains the most common crime, while Homicide and Robbery rates have remained stable. The data shows an upward trend in crime rates after 2020, particularly in Assault and Auto Theft, suggesting a link between population density and increased criminal activity, especially post-pandemic.
+The analysis revealed significant variations in crime rates over time, particularly in property-related offenses such as Auto Theft and Break and Enter. Assault remains the most common crime in past decade, while Homicide and Robbery rates have remained stable. The data shows an upward trend in crime rates after 2020, particularly in Assault and Auto Theft, suggesting a link between population density and increased criminal activity, especially post-pandemic.
 
 ##  Population Density as a Key Driver of Crime
 The increasing trend in crimes like auto theft and assault calls for immediate attention from policymakers. As shown in the data, crime rates do not arise uniformly across all neighborhoods but are concentrated in specific areas. This concentration suggests that socioeconomic factors, along with population density, play a significant role in the prevalence of crime. The sharp increase in auto theft post-2020 highlights the need for enhanced security measures, while the stable yet high assault rates point to the need for sustained law enforcement efforts in vulnerable neighborhoods.
+Spatial Distribution of Crime: Crime is not randomly distributed but tends to cluster in specific neighborhoods with particular socioeconomic characteristics. High concentrations of both property and violent crime are observed in the downtown core, the northeast (North York), and the northwest (Etobicoke), while lower crime rates are observed in central and west Toronto. The study also reveals a U-shaped spatial pattern where neighborhoods with lower socioeconomic status experience higher crime rates  .
+	
 The data clearly shows a significant correlation between population density and crime frequency in Toronto neighborhoods. Densely populated areas such as Moss Park, St. Lawrence-East Bayfront, and Kensington-Chinatown consistently rank among the highest in terms of crime rates. The findings support criminological theories suggesting that increased population density creates more opportunities for crime due to social fragmentation and anonymity. Urban planners and policymakers must consider interventions such as improved public surveillance and community engagement initiatives to reduce crime in high-density areas.
 The relationship between population density and crime suggests that urban planners and local governments should consider designing interventions that specifically address high-density environments. Strategies such as better lighting, increased public surveillance (e.g., CCTV), and more frequent police patrols can act as deterrents in areas where crime tends to cluster. Additionally, promoting community cohesion through events, neighborhood associations, and resident engagement initiatives can reduce the social disorganization that often accompanies densely populated urban settings.
 
 ## Socioeconomic Disparities and Crime Hotspots
+
+@Wang's study also highlights the significant role of socioeconomic deprivation, residential instability, and ethnic concentration in explaining the spatial distribution of crime. Neighborhoods characterized by high levels of deprivation and instability tend to have higher rates of violent crime, while property crimes are more widespread but still related to similar socioeconomic factors  .
 Socioeconomic factors, alongside population density, play a significant role in shaping crime patterns. Neighborhoods with higher levels of economic disadvantage, such as Moss Park and York University Heights, tend to have elevated crime rates, while affluent areas like Kingsway South report significantly lower crime levels. This suggests that addressing socioeconomic disparities is essential for reducing crime. Targeted social interventions, such as improving access to education, healthcare, and employment opportunities, could help mitigate the underlying causes of crime.
 @fig-rates shows several crime types, notably Assault and Auto Theft, experienced noticeable increases after 2020, possibly indicating societal shifts, such as the impacts of the pandemic on public safety and economic conditions.
 Crime rates also vary between urban and rural areas. Densely populated urban areas typically experience higher crime rates due to greater social anonymity, economic disparities, and more opportunities for criminal activity. Conversely, remote rural areas often face challenges related to limited police resources, complicating crime prevention and law enforcement efforts.
@@ -371,10 +366,11 @@ Future research should expand on these findings by incorporating additional data
 
 \newpage
 # Acknowledgements
-All data is analyzed in R (@citeR), using packages Tidyverse (@tidyverse), Dplyr(@dplyr), Geojsonsf(@geojsonsf), Httr (@httr), Knitr(@knitr) and ggplot2 (@ggplot2), sf(@sf), gt(@gt), lintr(@lintr) in order to visualize the data and communicate information intuitively.
+All data is analyzed in R [@citeR], using packages Tidyverse [@tidyverse], Dplyr [@dplyr], Geojsonsf [@geojsonsf], Httr [@httr], Knitr [@knitr] and ggplot2 [@ggplot2], sf (@sf), gt (@gt), lintr [@lintr] in order to visualize the data and communicate information intuitively.
 
 We would like to express our appreciation to the City of Toronto and the Open Data Portal for granting access to the dataset via the Open Data Toronto package [@opendatatoronto]. Besides, R codes from @citerohan are used to provide tables in this paper.The provision of high-quality, open-source data is essential for enabling precise research. Thanks to @openai2023chatgpt, which is used in this research paper.Code written in the scripts was checked and styled with lintr [@citelintr] and styler [@citestyler]. 
 
+\newpage
 # References
 
 
