@@ -9,10 +9,10 @@ Toronto Average,Assault,2020,605.1264657113924
 Toronto Average,Assault,2021,637.6508698297469
 Toronto Average,Assault,2022,703.0304727759493
 Toronto Average,Assault,2023,806.310513171519
-Toronto Average,Auto Theft,2014,122.89473471284808
+Toronto Average,Auto Theft,2014,122.89473471284809
 Toronto Average,Auto Theft,2015,114.57124489583438
-Toronto Average,Auto Theft,2016,113.862643676519
-Toronto Average,Auto Theft,2017,121.32657565944588
+Toronto Average,Auto Theft,2016,113.86264367651899
+Toronto Average,Auto Theft,2017,121.32657565944587
 Toronto Average,Auto Theft,2018,159.45607662259494
 Toronto Average,Auto Theft,2019,175.0196540620886
 Toronto Average,Auto Theft,2020,186.9811098615823
@@ -31,11 +31,11 @@ Toronto Average,Bike Theft,2022,105.24456627767722
 Toronto Average,Bike Theft,2023,105.51889845061687
 Toronto Average,Break and Enter,2014,268.1830053651266
 Toronto Average,Break and Enter,2015,255.80262903544303
-Toronto Average,Break and Enter,2016,234.708453603038
+Toronto Average,Break and Enter,2016,234.70845360303798
 Toronto Average,Break and Enter,2017,248.01805244683544
 Toronto Average,Break and Enter,2018,264.2057763334177
 Toronto Average,Break and Enter,2019,293.5900489042405
-Toronto Average,Break and Enter,2020,241.96505872898732
+Toronto Average,Break and Enter,2020,241.96505872898734
 Toronto Average,Break and Enter,2021,193.5073921091139
 Toronto Average,Break and Enter,2022,205.55516027835444
 Toronto Average,Break and Enter,2023,258.2160666241772
@@ -45,16 +45,16 @@ Toronto Average,Homicide,2016,3.0436578733071427
 Toronto Average,Homicide,2017,2.7521423544714283
 Toronto Average,Homicide,2018,4.0968815225
 Toronto Average,Homicide,2019,3.2530327644928567
-Toronto Average,Homicide,2020,2.506312501414285
-Toronto Average,Homicide,2021,3.357167868928572
+Toronto Average,Homicide,2020,2.5063125014142855
+Toronto Average,Homicide,2021,3.3571678689285718
 Toronto Average,Homicide,2022,2.645687430221429
 Toronto Average,Homicide,2023,7.4097596555
 Toronto Average,Robbery,2014,136.92360857305732
-Toronto Average,Robbery,2015,124.98043953109492
+Toronto Average,Robbery,2015,124.98043953109493
 Toronto Average,Robbery,2016,132.00955445579618
 Toronto Average,Robbery,2017,141.36336175979747
-Toronto Average,Robbery,2018,127.87420834776584
-Toronto Average,Robbery,2019,120.68836392259492
+Toronto Average,Robbery,2018,127.87420834776583
+Toronto Average,Robbery,2019,120.68836392259493
 Toronto Average,Robbery,2020,92.66101941696202
 Toronto Average,Robbery,2021,76.61872161887179
 Toronto Average,Robbery,2022,93.64640139192308
@@ -62,7 +62,7 @@ Toronto Average,Robbery,2023,104.53586777335669
 Toronto Average,Shooting,2014,6.354890641358974
 Toronto Average,Shooting,2015,10.84491793326282
 Toronto Average,Shooting,2016,14.494071883923077
-Toronto Average,Shooting,2017,13.880655892250005
+Toronto Average,Shooting,2017,13.880655892250003
 Toronto Average,Shooting,2018,14.409957892108975
 Toronto Average,Shooting,2019,17.02262326232692
 Toronto Average,Shooting,2020,14.879959241269232
@@ -72,7 +72,7 @@ Toronto Average,Shooting,2023,15.678326296345132
 Toronto Average,Theft Over,2014,37.574960614084965
 Toronto Average,Theft Over,2015,37.09630348770253
 Toronto Average,Theft Over,2016,38.9173551719396
-Toronto Average,Theft Over,2017,41.45636641062092
+Toronto Average,Theft Over,2017,41.456366410620916
 Toronto Average,Theft Over,2018,42.94021212670779
 Toronto Average,Theft Over,2019,46.4579751049363
 Toronto Average,Theft Over,2020,41.020082434038216
