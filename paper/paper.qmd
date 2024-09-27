@@ -6,7 +6,7 @@ thanks: "Code and data are available at:https://github.com/Cassieliu77/Crime-Pat
 date: 27 September 2024
 date-format: long
 toc: true 
-abstract: "This paper examines the relationship between population density and crime distribution across Toronto neighborhoods from 2014 to 2023. The analysis reveals that high-density areas experience higher crime rates, particularly for auto theft and assault, with socioeconomic factors further influencing crime patterns. Based on these findings, we propose targeted interventions and offer data-driven suggestions for policymakers and urban planners to enhance crime prevention strategies in Toronto."
+abstract: "This paper examines the relationship between population density and crime patterns across Toronto neighborhoods from 2014 to 2023. The analysis reveals that high-density areas experience higher crime rates, particularly for auto theft and assault, with socioeconomic factors further influencing crime patterns. Based on these findings, we propose targeted interventions and offer data-driven suggestions for policymakers and urban planners to enhance crime prevention strategies in Toronto."
 format: pdf
 number-sections: true
 bibliography: references.bib
@@ -35,6 +35,8 @@ Urban crime is a pressing issue for policymakers and researchers, especially in 
 Toronto's urban landscape is diverse, with neighborhoods varying widely in terms of socioeconomic status and population density. Previous research has established that densely populated areas tend to experience higher crime rates, particularly for property crimes such as auto theft and break-and-enter offenses. Moreover, socioeconomic factors such as poverty and residential instability further contribute to crime concentration in certain neighborhoods. This study aims to explore these relationships by analyzing data on crime occurrences across 158 neighborhoods.
 
 By examining crime trends over a decade, this research seeks to inform policymakers about the specific challenges faced by high-density neighborhoods. The study's findings will guide the development of targeted crime prevention strategies, emphasizing the importance of urban planning and community engagement in reducing criminal activity. Through this approach, we aim to offer data-driven suggestions that contribute to safer, more resilient urban environments in Toronto.
+
+In the sections that follow, this paper outlines the data used and measurement methods, presents the results derived from the data and discusses the implications of these results. These findings underscore the critical need for nuanced urban planning and tailored law enforcement strategies to mitigate crime in densely populated areas of Toronto.
 
 # Data {#sec-data}
 ## Data Overview
@@ -280,7 +282,7 @@ ggplot(crime_data_sf) +
   scale_size_continuous(name = "Shooting Count", range = c(1, 10), breaks = c(5, 10, 15, 20)) +
   labs(
     title = "Shooting Count and Population Density",
-    subtitle = "By Neighborhood",
+    subtitle = "By Neighborhoods",
     x = "Longitude", y = "Latitude"
   ) +
   theme_minimal() +
