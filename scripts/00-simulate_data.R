@@ -5,7 +5,6 @@
 # Contact: cassieliu.liu@mail.utoronto.ca
 # License: MIT
 # Pre-requisites: Construct a sketch about the data frame roughly.
-# Any other information needed? NA
 
 #### Workspace setup ####
 library(sf) 

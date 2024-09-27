@@ -32,9 +32,7 @@ crime_data_sf <- lapply(coordinates_list, function(coords) {
   if (all(coords[1, ] == coords[nrow(coords), ])) {
     st_polygon(list(coords))  
   } else {
-    st_linestring(coords) 
-  }
-})
+    st_linestring(coords) }})
 crime_data$geometry <- st_sfc(crime_data_sf)
 crime_data_sf <- st_as_sf(crime_data)
 print(st_geometry(crime_data_sf))
