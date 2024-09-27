@@ -1,5 +1,4 @@
-# Exploring the Impact of Population Density on Crime Distribution in Toronto Neighborhoods (2014–2023)
-
+# Assessing Population Density and Crime Patterns in Toronto Neighborhoods (2014–2023)
 ## Overview
 
 This repo shows the research on the crime frequency and population in Toronto. 
