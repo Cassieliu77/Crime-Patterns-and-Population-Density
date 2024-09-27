@@ -1,7 +1,7 @@
 # Assessing Population Density and Crime Patterns in Toronto Neighborhoods (2014–2023)
 ## Overview
 
-This repository examines the relationship between population density and crime distribution across Toronto neighborhoods from 2014 to 2023
+This repository examines the relationship between population density and crime distribution across Toronto neighborhoods from 2014 to 2023.
 
 
 ## File Structure
