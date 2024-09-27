@@ -6,7 +6,7 @@ thanks: "Code and data are available at:https://github.com/Cassieliu77/Crime-Fre
 date: 27 September 2024
 date-format: long
 toc: true 
-abstract: "This study examines the relationship between population density and crime distribution across Toronto neighborhoods from 2014 to 2023. The analysis reveals that high-density areas experience higher crime rates, particularly for auto theft and assault, with socioeconomic factors further influencing crime patterns. Based on these findings, we propose targeted interventions, such as improved public surveillance and increased community engagement, to address crime in high-risk areas. This research offers valuable insights for policymakers and urban planners to enhance crime prevention strategies in Toronto."
+abstract: "This paper examines the relationship between population density and crime distribution across Toronto neighborhoods from 2014 to 2023. The analysis reveals that high-density areas experience higher crime rates, particularly for auto theft and assault, with socioeconomic factors further influencing crime patterns. Based on these findings, we propose targeted interventions and offers data-driven suggestions for policymakers and urban planners to enhance crime prevention strategies in Toronto."
 format: pdf
 number-sections: true
 bibliography: references.bib
@@ -40,7 +40,7 @@ By examining crime trends over a decade, this research seeks to inform policymak
 ## Data Overview
 The Neighborhood Crime Rates dataset, obtained from @opendatatoronto, spans from 2014 to 2023 and covers 158 Toronto neighborhoods.It is designed to offer communities more information about public safety and awareness. The data provided to the Toronto Police Service by reporting parties is preliminary and may not have undergone full verification at the time of publication. The dataset includes various crime types such as Assault, Auto Theft, Robbery, Break and Enter, Bike Theft, Shooting, and Homicide. According to the standard definition by Statistics Canada, the crime rate is calculated as the number of crimes per 100,000 people each year. Besides, crime counts per crime type per year are also shown in the data. In @opendatatoronto, another variable of interest *Population 2023* refers to the population in the 2023 year in each neighborhood, enabling the analysis of the relationship between population density and crime frequency. Geometry column is transformed into spatial data to build up the Toronto city map to observe population density and crime distribution. @tbl-rawdata gives us a glimpse of how the dataset looks. Each neighborhood is identified by its *Area Name* and a unique *Hood ID*. 
 
-The average crime rates represent the mean crime rate across 158 neighborhoods from 2014 to 2023, and were calculated to analyze long-term trends and highlight crime types that have seen significant increases. The variables *Crime Type* and *Crime Count* are based on 2023 data (@tbl-summary1).Each neighborhood’s average rank was determined by ranking all 158 neighborhoods based on their total annual crime count. A rank is assigned for each year, and the average rank over the past decade (2014–2023) is calculated by averaging these yearly ranks. A lower rank indicates a higher crime count. Summaries of the top 10 and bottom 10 ranked neighborhoods are provided in @tbl-summary2 and @tbl-summary4.
+The average crime rates represent the mean crime rate across 158 neighborhoods from 2014 to 2023, and were calculated to analyze long-term trends and highlight crime types that have seen significant increases. The variables *Crime Type* and *Crime Count* are based on 2023 data (@tbl-summary1).Each neighborhood’s average rank was determined by ranking all 158 neighborhoods based on their total annual crime count. A rank is assigned for each year, and the average rank over the past decade (2014–2023) is calculated by averaging these yearly ranks. A lower rank indicates a higher crime count. Summaries of the Top 10 and Bottom 10 ranked neighborhoods are provided in @tbl-summary2 and @tbl-summary4.
 
 ```{r}
 #| label: tbl-rawdata
@@ -84,7 +84,7 @@ kable(head(crime_count_summary, 10))
 
 ```{r}
 #| label: tbl-summary2
-#| tbl-cap: Summary Table for Top10 Crime-Prone Neighborhoods (2014-2023)
+#| tbl-cap: Summary Table for Top 10 Crime-Prone Neighborhoods (2014-2023)
 #| echo: false
 #| warning: false
 #| message: false
@@ -101,7 +101,6 @@ As for the measurement, the crime rate is measured using population estimates fr
 
 Crime rates offer a more balanced comparison over time as they account for population changes in the area and give us a fairer way to see the crime trends in the past decade, which explains why a similar dataset called "Police Annual Statistical Report - Reported Crimes" is not be chosen as my dataset, which only contains the reported crime count for a certain year and a certain division. It lack a standard way to show the crime trends and spatial attribute to see the geography distribution and it also includes reported crimes deemed as unfounded.
 
-\newpage
 # Results
 ## Crime Rates Over the Past Decade
 @fig-rates uses the variable *Average Crime Rate* (@tbl-summary3) to show the crime rate trend between 2014 and 2023 and demonstrate the evolution of different crime types in the city of Toronto. It can be seen that the visualization reveals certain patterns in some specific crime types.
@@ -126,7 +125,7 @@ average_crime_rate |>
   kable()
 ```
 
-@fig-rates reveals a significant upward trend in **Auto Theft** and **Assault**, particularly after 2020. The crime rate for **Assault** consistently remained the highest across all crime types, starting at around 600 per 100,000 population in 2014 and reaching a peak of approximately 800 per 100,000 population in 2023. This consistent rise suggests that assault has been a persistent issue in Toronto, with an even sharper increase following the onset of the COVID-19 pandemic.**Break and Enter**,**Robbery** and **Theft Over** all experienced increases after 2021. This rise suggests a sharp increase in private property related crimes, possibly influenced by socioeconomic factors or changes in law enforcement or technology. In contrast, **Homicide** and **Shooting** had relatively lower crime rates and displayed more stability over time, with little significant change compared to **Assault** and **Auto Theft**.
+@fig-rates reveals a significant upward trend in **Auto Theft** and **Assault**, particularly after 2020. The crime rate for **Assault** consistently remained the highest across all crime types, starting at around 600 per 100,000 population in 2014 and reaching a peak of approximately 800 per 100,000 population in 2023. This consistent rise suggests that assault has been a persistent issue in Toronto, with an even sharper increase following the onset of the COVID-19 pandemic. **Break and Enter**,**Robbery** and **Theft Over** all experienced increases after 2021. This rise suggests a sharp increase in private property related crimes, possibly influenced by socioeconomic factors or changes in law enforcement or technology. In contrast, **Homicide** and **Shooting** had relatively lower crime rates and displayed more stability over time, with little significant change compared to **Assault** and **Auto Theft**.
 
 ```{r}
 #| label: fig-rates
@@ -178,7 +177,7 @@ ggplot(crime_data_sf) +
   theme(
     panel.grid = element_blank(),
     plot.title = element_text(size = 18, face = "bold"),
-    plot.subtitle = element_text(size = 12)
+    plot.subtitle = element_text(size = 13)
   )
 ```
 \newpage
@@ -303,7 +302,7 @@ Neighborhoods like West Humber-Clairville and York University Heights ranked amo
 
 ```{r}
 #| label: fig-rank-crime
-#| fig-cap: Top10 Ranked Crime-Prone Neigborhoods (2014-2023)
+#| fig-cap: Top 10 Ranked Crime-Prone Neigborhoods (2014-2023)
 #| echo: false
 #| warning: false
 #| message: false
@@ -329,7 +328,7 @@ ggplot(top_10_neighborhoods, aes(x = reorder(Neighborhood_ID_Name, Average_Rank)
 
 ```{r}
 #| label: tbl-summary4
-#| tbl-cap: Top10 Ranked Safest Neigborhoods (2014-2023)
+#| tbl-cap: Top 10 Ranked Safest Neigborhoods (2014-2023)
 #| echo: false
 #| warning: false
 #| message: false
