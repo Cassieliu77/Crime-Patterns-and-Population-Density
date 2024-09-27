@@ -1,10 +1,10 @@
 #### Preamble ####
-# Purpose: Clean the raw data and make it available for construcing graphs
+# Purpose: Clean the raw data and make it available for visualization
 # Author: Yongqi Liu
 # Date: 20 Sep 2024 
 # Contact: cassieliu.liu@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: Have the raw data ready for processing
+# Pre-requisites: Have the raw data ready for cleaning
 
 #### Workspace setup ####
 #install.packages("sf") for handling the spatial data
@@ -15,6 +15,7 @@ library(tidyverse)
 library(dplyr)
 
 #### Clean data ####
+
 # Handling the spatial data, split the geometry column into longitude and latitude
 crime_data <- read.csv("data/raw_data/raw_crime_data.csv")
 extract_coordinates <- function(geometry_list) {
@@ -23,8 +24,8 @@ extract_coordinates <- function(geometry_list) {
   n <- length(coordinates) / 2
   longitudes <- coordinates[1:n]
   latitudes <- coordinates[(n+1):(2*n)]
-  matrix(c(longitudes, latitudes), ncol = 2, byrow = FALSE)
-}
+  matrix(c(longitudes, latitudes), ncol = 2, byrow = FALSE)}
+
 # Apply the function to each row of the geometry column and get a list of coordinate matrices
 coordinates_list <- lapply(crime_data$geometry, extract_coordinates)
 crime_data_sf <- lapply(coordinates_list, function(coords) {
@@ -61,7 +62,6 @@ crime_long<- crime_long %>% rename(Average_Crime_Rate=value)
 head(crime_long)
 
 # Clean the dataset for the combination of maps for per type of crime
-# Transform and clean crime_long_1
 crime_long_1 <- crime_data_sf %>%
   pivot_longer(cols = c(ASSAULT_2023, ROBBERY_2023, BREAKENTER_2023, THEFTOVER_2023, AUTOTHEFT_2023,
                         BIKETHEFT_2023, SHOOTING_2023, HOMICIDE_2023), 
@@ -78,12 +78,10 @@ crime_long_1 <- crime_data_sf %>%
     Crime_Type == "SHOOTING_2023" ~ "Shooting",
     TRUE ~ Crime_Type
   )) %>%
-  drop_na(Crime_Count)  # Remove rows where Crime_Count is NA
-# Check the result
+  drop_na(Crime_Count)  
 glimpse(crime_long_1)
 
-
-#Get the crime count for different neighbourhood in different years
+#Get the crime count for different neighborhood in different years
 crime_summary_multiple_years <- crime_data %>%
   rowwise() %>%
   mutate(Total_Crime_2014 = sum(c_across(contains("_2014") & !contains("_RATE")), na.rm = TRUE),
@@ -133,6 +131,7 @@ crime_ranking_summary <- crime_ranking_summary %>%
   ungroup() %>%
   arrange(Average_Rank)
 colnames(crime_ranking_summary)
+
 # View top 10 neighborhoods with consistently highest crime
 top_10_neighborhoods_consistent <- crime_ranking_summary %>% head(10)
 print(top_10_neighborhoods_consistent)
@@ -141,11 +140,8 @@ print(top_10_neighborhoods_consistent)
 bottom_10_neighborhoods_consistent <- crime_ranking_summary %>% tail(10)
 print(bottom_10_neighborhoods_consistent)
 
-
-
 #### Save data ####
 saveRDS(crime_data_sf, "data/analysis_data/cleaning_crime_data.rds")
-#write_csv(crime_data_sf, "data/analysis_data/cleaning_crime_data.csv")
 write_csv(crime_long, "data/analysis_data/toronto_crime_average_rates.csv")
 write_rds(crime_long_1, "data/analysis_data/cleaning_crime_count.rds")
 write_csv(top_10_neighborhoods_consistent, "data/analysis_data/top_10_neighborhoods.csv")
