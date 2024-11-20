@@ -1,70 +1,128 @@
 #### Preamble ####
-# Purpose: Simulate the data
+# Purpose: Simulates a dataset for the wordbank data.
 # Author: Yongqi Liu
-# Date: 18 Sep 2024 
+# Date: 9 Nov 2024 
 # Contact: cassieliu.liu@mail.utoronto.ca
 # License: MIT
-# Pre-requisites: Construct a sketch about the data frame roughly.
+# Pre-requisites: 
+# - The `tidyverse` package must be installed and loaded
+# - Need write a sketch about how the real dataset looks like
+# Any other information needed? NA
+
 
 #### Workspace setup ####
-library(sf) 
+# Load necessary libraries
 library(tidyverse)
-library(dplyr)
-set.seed(666)
 
-# Simulate Neighborhoods
-n_neighborhoods <- 158
-neighborhood_ids <- 1:n_neighborhoods
-neighborhood_names <- paste("Neighborhood", neighborhood_ids)
+# Set seed for reproducibility
+set.seed(6666)  
 
-# Simulate Population Data for 2023
-population_2023 <- rnorm(n_neighborhoods, mean = 20000, sd = 5000) 
+#### Simulate data ####
+# Simulating data_id as a unique identifier
+data_id <- 1:10000
 
-# Simulate Crime Counts for 2023 (using Poisson distribution) for each neighborhood
-crime_types <- c("Assault", "Robbery", "Break and Enter", "Theft Over", 
-                 "Auto Theft", "Bike Theft", "Homicide", "Shooting")
+# Simulating item_id (e.g., "item_1", "item_2", etc.)
+item_id <- paste("item", sample(1:20, 10000, replace = TRUE), sep = "_")
 
-# Simulate crime counts for each neighborhood for each crime type
-crime_counts <- sapply(crime_types, function(crime_type) {
-  rpois(n_neighborhoods, lambda = sample(50:500, 1))  # Generate 158 Poisson-distributed counts for each crime type
-})
+# Simulating language (e.g., "English (American)")
+language <- sample(
+  c(
+    "English (American)", "Spanish", "French", "German", "Chinese", "Japanese",
+    "Korean", "Arabic", "Russian", "Hindi", "Portuguese", "Italian",
+    "Swedish", "Dutch", "Turkish", "Bengali", "Vietnamese", "Thai"
+  ),
+  size = 10000,
+  replace = TRUE)
 
-# Convert crime counts to a data frame (each crime type has 158 rows)
-crime_data_sim <- data.frame(
-  HOOD_ID = neighborhood_ids,
-  AREA_NAME = neighborhood_names,
-  POPULATION_2023 = population_2023,
-  crime_counts  )
+# Simulating form (e.g., "WS")
+form <- sample(
+  c("Words and Sentences", "Short Form of Words and Sentences", 
+    "Words and Gestures", "Short Form of Words and Gestures"),
+  size = 10000,
+  replace = TRUE)
 
-# Rename columns appropriately
-colnames(crime_data_sim)[4:11] <- crime_types
+# Simulating item_kind (e.g., "word")
+item_kind <- sample(
+  c("first_signs", "phrases", "starting_to_talk", "word", "gestures_first",
+    "gestures_games", "gestures_objects", "gestures_parent", "gestures_adult",
+    "how_use_words", "word_endings", "word_forms_nouns", "word_forms_verbs",
+    "word_endings_nouns", "word_endings_verbs", "combine", "complexity"),
+  size = 10000,
+  replace = TRUE)
 
-# Create crime rates (per 100,000 population)
-crime_rate_sim <- crime_data_sim %>%
-  mutate(
-    ASSAULT_RATE_2023 = Assault / POPULATION_2023 * 100000,
-    ROBBERY_RATE_2023 = Robbery / POPULATION_2023 * 100000,
-    BREAKENTER_RATE_2023 = `Break and Enter` / POPULATION_2023 * 100000,
-    THEFTOVER_RATE_2023 = `Theft Over` / POPULATION_2023 * 100000,
-    AUTOTHEFT_RATE_2023 = `Auto Theft` / POPULATION_2023 * 100000,
-    BIKETHEFT_RATE_2023 = `Bike Theft` / POPULATION_2023 * 100000,
-    HOMICIDE_RATE_2023 = Homicide / POPULATION_2023 * 100000,
-    SHOOTING_RATE_2023 = Shooting / POPULATION_2023 * 100000)
+# Simulating category (e.g., "sounds")
+# Define unique categories
+categories <- c(
+  "sounds", "animals", "vehicles", "toys", "food_drink", "clothing", "body_parts", 
+  "furniture_rooms", "household", "outside", "people", "games_routines", "action_words", 
+  "time_words", "descriptive_words", "pronouns", "question_words", "locations", 
+  "quantifiers", "places", "helping_verbs", "connecting_words")
 
-# Simulate random spatial points for neighborhoods within a defined range
-coords <- data.frame(
-  longitude = runif(n_neighborhoods, min = -79.6, max = -79.2),  # Longitude range for Toronto
-  latitude = runif(n_neighborhoods, min = 43.6, max = 43.8)      # Latitude range for Toronto
+# Simulate category (randomly assign categories to each row)
+category <- sample(categories, size = 10000, replace = TRUE)
+
+
+# Define a subset of uni_lemma values
+uni_lemma_values <- c(
+  "crocodile", "bee", "cat", "dog", "elephant", "fish (animal)", "frog",
+  "giraffe", "hat", "pants", "shoe", "blanket", "bottle", "knife", 
+  "spoon", "tissue", "toothbrush", "mommy", "daddy", "baby", 
+  "apple", "banana", "bread", "cheese", "chocolate", "juice", 
+  "pizza", "ice cream", "sandwich", "carrot"
 )
 
-# Combine the crime data with the coordinates
-crime_rate_sim <- cbind(crime_rate_sim, coords)
+# Simulate uni_lemma values
+uni_lemma <- sample(uni_lemma_values, size = 10000, replace = TRUE)
 
-# Convert to an sf object (Simple Features for spatial data)
-crime_data_sf_sim <- st_as_sf(crime_rate_sim, coords = c("longitude", "latitude"), crs = 4326)
 
-print(head(crime_data_sf_sim))
+# Simulating lexical_category (e.g., "other")
+lexical_category <- sample(
+  c("other", "noun", "verb", "adjective", "other"),
+  size = 10000,
+  replace = TRUE)
 
-#### Save Simulated Data ####
-saveRDS(crime_data_sf_sim, "data/raw_data/simulated_crime_data.rds")
-write_csv(crime_rate_sim, "data/raw_data/simulated_crime_data.csv")
+
+# Simulating date_of_test (random dates within a range)
+date_of_test <- sample(
+  seq(as.Date("2010-01-01"), as.Date("2010-12-31"), by = "day"),
+  size = 10000,
+  replace = TRUE)
+
+# Simulating age (random ages between 18 and 60)
+age <- sample(18:60, size = 10000, replace = TRUE)
+
+# Simulating comprehension (random values between 100 and 800)
+comprehension <- sample(100:800, size = 10000, replace = TRUE)
+
+# Simulating production (random values between 100 and 700)
+production <- sample(100:700, size = 10000, replace = TRUE)
+
+# Simulating is_norming (TRUE/FALSE values)
+is_norming <- sample(c(TRUE, FALSE), size = 10000, replace = TRUE)
+
+# Simulating child_id (unique child IDs between 10000 and 99999)
+child_id <- sample(10000:99999, size = 10000, replace = TRUE)
+
+# Combine all simulated columns into a single dataset
+simulated_data <- tibble(
+  data_id = data_id,
+  item_id = item_id,
+  language = language,
+  form = form,
+  item_kind = item_kind,
+  category = category,
+  uni_lemma = uni_lemma,
+  lexical_category = lexical_category,
+  date_of_test = date_of_test,
+  age = age,
+  comprehension = comprehension,
+  production = production,
+  is_norming = is_norming,
+  child_id = child_id)
+
+# View the first few rows of the combined dataset
+head(simulated_data)
+
+#### Save data ####
+# Save the simulated dataset to a CSV file
+write_csv(simulated_data, "data/00-simulated_data/simulated_data.csv")
